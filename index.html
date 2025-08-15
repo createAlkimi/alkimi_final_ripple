@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ripple x Alkimi Stablecoin Partnership</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .insights {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+            border-left: 5px solid #3b82f6;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .insights h2 {
+            color: #1e40af;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .insights ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .insights li {
+            margin-bottom: 10px;
+            color: #1e40af;
+            font-weight: 500;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .insights li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .nested {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+
+        .nested li::before {
+            content: "-";
+            color: #60a5fa;
+        }
+
+        .summary {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .summary h2 {
+            color: #1f2937;
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .country-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .country-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--country-color);
+        }
+
+        .country-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .country-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        .budget-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .budget-low, .budget-high {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .budget-low {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .budget-high {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .performance-metric {
+            margin: 8px 0;
+            font-size: 0.95rem;
+        }
+
+        .below-baseline {
+            color: #7c3aed;
+            font-weight: 500;
+        }
+
+        .jbp-metric {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .lift-badge {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #166534;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 12px;
+            display: inline-block;
+            border: 1px solid #86efac;
+        }
+
+        .charts-section {
+            margin-top: 40px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .chart-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .metric-box {
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-box h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-box .value {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .metric-low {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .metric-high {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        .metric-below {
+            background: #faf5ff;
+            color: #7c3aed;
+        }
+
+        .metric-advantage {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .footer {
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            margin: 5px 0;
+        }
+
+        /* Country color variables */
+        .us { --country-color: #3b82f6; }
+        .uk { --country-color: #ef4444; }
+        .brazil { --country-color: #10b981; }
+        .mexico { --country-color: #f59e0b; }
+        .switzerland { --country-color: #8b5cf6; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .countries-grid { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>Ripple x Alkimi Stablecoin Partnership</h1>
+            <div class="subtitle">Outlining 3 different partnership opportunities over a 6 month period, showcasing the audience saturation levels at each</div>
+            <div class="controls">
+                <button class="btn" onclick="downloadCSV()">📊 Download CSV</button>
+                <button class="btn" onclick="copyToClipboard()">📋 Copy Summary</button>
+                <button class="btn" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="insights">
+                <h2>Key Insights</h2>
+                <ul>
+                    <li>Below Baseline and Baseline partnership will offer 10% AV media impressions</li>
+                    <li>JBP partnership will unlock 30% AV media impressions over time</li>
+                    <li>JBP spend levels:
+                        <ul class="nested">
+                            <li>$0-1m: 10% AV media impressions</li>
+                            <li>$1-2m: 15% AV media impressions</li>
+                            <li>$2-3m: 20% AV media impressions</li>
+                            <li>$3m+: 30% AV media impressions</li>
+                        </ul>
+                    </li>
+                    <li>Through a JBP, Alkimi will allow Ripple to reach a higher audience saturation % over time at no additional investment from Ripple</li>
+                </ul>
+            </div>
+
+            <div class="summary">
+                <h2>JBP Performance Summary</h2>
+                <div class="countries-grid">
+                    <div class="country-card us">
+                        <div class="country-name">United States</div>
+                        <div class="budget-info">
+                            <div class="budget-low">Low: $600,000</div>
+                            <div class="budget-high">High: $2,300,000</div>
+                        </div>
+                        <div class="performance-metric below-baseline">Below Baseline: 9.8%</div>
+                        <div class="performance-metric jbp-metric">JBP: 41.4%</div>
+                        <div class="lift-badge">+31.6% lift</div>
+                    </div>
+                    
+                    <div class="country-card uk">
+                        <div class="country-name">United Kingdom</div>
+                        <div class="budget-info">
+                            <div class="budget-low">Low: $180,000</div>
+                            <div class="budget-high">High: $450,000</div>
+                        </div>
+                        <div class="performance-metric below-baseline">Below Baseline: 14.0%</div>
+                        <div class="performance-metric jbp-metric">JBP: 40.1%</div>
+                        <div class="lift-badge">+26.1% lift</div>
+                    </div>
+                    
+                    <div class="country-card brazil">
+                        <div class="country-name">Brazil</div>
+                        <div class="budget-info">
+                            <div class="budget-low">Low: $180,000</div>
+                            <div class="budget-high">High: $420,000</div>
+                        </div>
+                        <div class="performance-metric below-baseline">Below Baseline: 14.7%</div>
+                        <div class="performance-metric jbp-metric">JBP: 39.8%</div>
+                        <div class="lift-badge">+25.1% lift</div>
+                    </div>
+                    
+                    <div class="country-card mexico">
+                        <div class="country-name">Mexico</div>
+                        <div class="budget-info">
+                            <div class="budget-low">Low: $60,000</div>
+                            <div class="budget-high">High: $120,000</div>
+                        </div>
+                        <div class="performance-metric below-baseline">Below Baseline: 37.7%</div>
+                        <div class="performance-metric jbp-metric">JBP: 86.5%</div>
+                        <div class="lift-badge">+48.8% lift</div>
+                    </div>
+                    
+                    <div class="country-card switzerland">
+                        <div class="country-name">Switzerland</div>
+                        <div class="budget-info">
+                            <div class="budget-low">Low: $60,000</div>
+                            <div class="budget-high">High: $120,000</div>
+                        </div>
+                        <div class="performance-metric below-baseline">Below Baseline: 38.3%</div>
+                        <div class="performance-metric jbp-metric">JBP: 87.4%</div>
+                        <div class="lift-badge">+49.1% lift</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-section">
+                <div class="charts-grid" id="chartsContainer">
+                    <!-- Charts will be dynamically generated here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Ripple x Alkimi Partnership Analysis</strong></p>
+            <p>Interactive dashboard showcasing partnership opportunities and performance metrics</p>
+            <p id="generatedDate"></p>
+        </div>
+    </div>
+
+    <script>
+        // Country data with all metrics
+        const countryData = {
+            US: {
+                name: 'United States',
+                months: ['Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 2026'],
+                lowBudgets: [100000, 100000, 100000, 100000, 100000, 100000],
+                highBudgets: [300000, 400000, 400000, 400000, 400000, 400000],
+                belowBaselineSaturation: [3.29, 5.35, 6.85, 8.03, 9.00, 9.82],
+                baselineSaturation: [10.87, 19.93, 26.52, 31.70, 35.96, 39.58],
+                jbpSaturation: [10.87, 19.93, 26.82, 32.47, 37.12, 41.40],
+                color: '#3b82f6'
+            },
+            UK: {
+                name: 'United Kingdom',
+                months: ['Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 2026'],
+                lowBudgets: [30000, 30000, 30000, 30000, 30000, 30000],
+                highBudgets: [75000, 75000, 75000, 75000, 75000, 75000],
+                belowBaselineSaturation: [4.70, 7.64, 9.77, 11.45, 12.83, 14.01],
+                baselineSaturation: [12.92, 21.00, 26.87, 31.48, 35.29, 38.52],
+                jbpSaturation: [12.92, 21.00, 27.14, 32.17, 36.32, 40.13],
+                color: '#ef4444'
+            },
+            Brazil: {
+                name: 'Brazil',
+                months: ['Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 2026'],
+                lowBudgets: [30000, 30000, 30000, 30000, 30000, 30000],
+                highBudgets: [70000, 70000, 70000, 70000, 70000, 70000],
+                belowBaselineSaturation: [4.95, 8.04, 10.29, 12.05, 13.51, 14.74],
+                baselineSaturation: [12.69, 20.63, 26.40, 30.93, 34.67, 37.84],
+                jbpSaturation: [12.69, 20.99, 27.02, 31.97, 36.04, 39.79],
+                color: '#10b981'
+            },
+            Mexico: {
+                name: 'Mexico',
+                months: ['Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 2026'],
+                lowBudgets: [10000, 10000, 10000, 10000, 10000, 10000],
+                highBudgets: [20000, 20000, 20000, 20000, 20000, 20000],
+                belowBaselineSaturation: [15.43, 23.15, 28.29, 32.15, 35.24, 37.65],
+                baselineSaturation: [33.95, 50.93, 62.25, 70.74, 77.53, 82.83],
+                jbpSaturation: [33.95, 51.70, 63.53, 72.79, 80.20, 86.47],
+                color: '#f59e0b'
+            },
+            Switzerland: {
+                name: 'Switzerland',
+                months: ['Aug 2025', 'Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 2026'],
+                lowBudgets: [10000, 10000, 10000, 10000, 10000, 10000],
+                highBudgets: [20000, 20000, 20000, 20000, 20000, 20000],
+                belowBaselineSaturation: [15.64, 23.53, 28.72, 32.65, 35.79, 38.26],
+                baselineSaturation: [34.49, 51.73, 63.23, 71.85, 78.75, 84.14],
+                jbpSaturation: [34.49, 52.52, 64.53, 73.55, 81.07, 87.44],
+                color: '#8b5cf6'
+            }
+        };
+
+        // Create charts for each country
+        function createCharts() {
+            const container = document.getElementById('chartsContainer');
+            
+            Object.keys(countryData).forEach(countryCode => {
+                const country = countryData[countryCode];
+                const totalLow = country.lowBudgets.reduce((sum, budget) => sum + budget, 0);
+                const totalHigh = country.highBudgets.reduce((sum, budget) => sum + budget, 0);
+                const finalBelow = country.belowBaselineSaturation[country.belowBaselineSaturation.length - 1];
+                const finalJBP = country.jbpSaturation[country.jbpSaturation.length - 1];
+                const advantage = ((finalJBP - finalBelow) / finalBelow * 100);
+
+                // Create chart card
+                const chartCard = document.createElement('div');
+                chartCard.className = 'chart-card';
+                chartCard.innerHTML = `
+                    <div class="chart-title">${country.name}</div>
+                    <div class="chart-container">
+                        <canvas id="chart-${countryCode}"></canvas>
+                    </div>
+                    <div class="chart-metrics">
+                        <div class="metric-box metric-low">
+                            <h4>Low Budget Total</h4>
+                            <div class="value">$${totalLow.toLocaleString()}</div>
+                        </div>
+                        <div class="metric-box metric-high">
+                            <h4>High Budget Total</h4>
+                            <div class="value">$${totalHigh.toLocaleString()}</div>
+                        </div>
+                        <div class="metric-box metric-below">
+                            <h4>Below Baseline Saturation %</h4>
+                            <div class="value">${finalBelow.toFixed(1)}%</div>
+                        </div>
+                        <div class="metric-box metric-advantage">
+                            <h4>JBP Advantage</h4>
+                            <div class="value">+${advantage.toFixed(0)}%</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(chartCard);
+
+                // Create the chart
+                setTimeout(() => createChart(countryCode, country), 100);
+            });
+        }
+
+        // Create individual chart
+        function createChart(countryCode, country) {
+            const ctx = document.getElementById(`chart-${countryCode}`).getContext('2d');
+            
+            // Determine Y-axis scaling
+            const isSmallMarket = countryCode === 'US' || countryCode === 'UK' || countryCode === 'Brazil';
+            const maxY = isSmallMarket ? 50 : 100;
+            const stepSize = isSmallMarket ? 10 : 20;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: country.months,
+                    datasets: [
+                        {
+                            label: 'Low Budget',
+                            data: country.lowBudgets,
+                            backgroundColor: country.color + '40',
+                            borderColor: country.color,
+                            borderWidth: 1,
+                            yAxisID: 'budget',
+                            order: 4,
+                            barPercentage: 0.8,
+                            categoryPercentage: 0.9
+                        },
+                        {
+                            label: 'High Budget',
+                            data: country.highBudgets,
+                            backgroundColor: country.color + '80',
+                            borderColor: country.color,
+                            borderWidth: 2,
+                            yAxisID: 'budget',
+                            order: 3,
+                            barPercentage: 0.8,
+                            categoryPercentage: 0.9
+                        },
+                        {
+                            label: 'Below Baseline',
+                            data: country.belowBaselineSaturation,
+                            type: 'line',
+                            borderColor: '#94a3b8',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [8, 4],
+                            pointBackgroundColor: '#94a3b8',
+                            pointRadius: 4,
+                            yAxisID: 'saturation',
+                            order: 1,
+                            fill: false
+                        },
+                        {
+                            label: 'Baseline',
+                            data: country.baselineSaturation,
+                            type: 'line',
+                            borderColor: '#64748b',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointBackgroundColor: '#64748b',
+                            pointRadius: 4,
+                            yAxisID: 'saturation',
+                            order: 1,
+                            fill: false
+                        },
+                        {
+                            label: 'JBP',
+                            data: country.jbpSaturation,
+                            type: 'line',
+                            borderColor: country.color,
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            pointBackgroundColor: country.color,
+                            pointRadius: 5,
+                            yAxisID: 'saturation',
+                            order: 1,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        budget: {
+                            type: 'linear',
+                            position: 'left',
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value/1000) + 'K';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Budget (USD)',
+                                color: '#374151'
+                            }
+                        },
+                        saturation: {
+                            type: 'linear',
+                            position: 'right',
+                            min: 10,
+                            max: maxY,
+                            ticks: {
+                                stepSize: stepSize,
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Audience Saturation (%)',
+                                color: '#374151'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#374151',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.yAxisID === 'budget') {
+                                        return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                                    } else {
+                                        return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Download CSV function
+        function downloadCSV() {
+            try {
+                const csvData = Object.keys(countryData).map(countryCode => {
+                    const country = countryData[countryCode];
+                    const totalLow = country.lowBudgets.reduce((sum, budget) => sum + budget, 0);
+                    const totalHigh = country.highBudgets.reduce((sum, budget) => sum + budget, 0);
+                    const finalBelow = country.belowBaselineSaturation[country.belowBaselineSaturation.length - 1];
+                    const finalJBP = country.jbpSaturation[country.jbpSaturation.length - 1];
+                    const lift = (finalJBP - finalBelow).toFixed(1);
+                    
+                    return [
+                        country.name,
+                        `$${totalLow.toLocaleString()}`,
+                        `$${totalHigh.toLocaleString()}`,
+                        `${finalBelow.toFixed(1)}%`,
+                        `${finalJBP.toFixed(1)}%`,
+                        `+${lift}%`
+                    ].join(',');
+                });
+
+                const csvContent = [
+                    'Ripple x Alkimi Stablecoin Partnership Summary',
+                    `Generated: ${new Date().toLocaleDateString()}`,
+                    '',
+                    'Country,Low Budget Total,High Budget Total,Below Baseline Final %,JBP Final %,JBP Lift',
+                    ...csvData
+                ].join('\\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ripple-alkimi-partnership-data.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                alert('✅ CSV downloaded successfully!');
+            } catch (error) {
+                alert('❌ Download failed. Please try again.');
+            }
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard() {
+            try {
+                const summaryText = `RIPPLE x ALKIMI STABLECOIN PARTNERSHIP SUMMARY
+Generated: ${new Date().toLocaleDateString()}
+
+KEY INSIGHTS:
+• Below Baseline and Baseline partnership: 10% AV media impressions
+• JBP partnership: 30% AV media impressions over time
+• JBP spend levels: $0-1m (10%), $1-2m (15%), $2-3m (20%), $3m+ (30%)
+• JBP enables higher audience saturation at no additional investment
+
+PERFORMANCE SUMMARY:
+${Object.keys(countryData).map(countryCode => {
+  const country = countryData[countryCode];
+  const totalLow = country.lowBudgets.reduce((sum, budget) => sum + budget, 0);
+  const totalHigh = country.highBudgets.reduce((sum, budget) => sum + budget, 0);
+  const finalBelow = country.belowBaselineSaturation[country.belowBaselineSaturation.length - 1];
+  const finalJBP = country.jbpSaturation[country.jbpSaturation.length - 1];
+  const lift = (finalJBP - finalBelow).toFixed(1);
+  
+  return `${country.name}: Low $${totalLow.toLocaleString()} | High $${totalHigh.toLocaleString()} | Below Baseline ${finalBelow.toFixed(1)}% | JBP ${finalJBP.toFixed(1)}% (+${lift}% lift)`;
+}).join('\\n')}`;
+
+                navigator.clipboard.writeText(summaryText).then(() => {
+                    alert('✅ Summary copied to clipboard!');
+                }).catch(() => {
+                    alert('❌ Copy failed. Please try manual selection.');
+                });
+            } catch (error) {
+                alert('❌ Copy failed. Please try again.');
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set date
+            document.getElementById('generatedDate').textContent = 
+                'Generated: ' + new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+            // Create charts
+            createCharts();
+        });
+    </script>
+</body>
+</html>
